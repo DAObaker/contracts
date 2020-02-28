@@ -1,0 +1,39 @@
+parameter string;
+storage (pair address mutez);
+code {
+       DUP;
+       DUP;
+       CDR;
+       CAR;
+       CONTRACT string;
+       IF_NONE {
+                 DROP; #fault handling for if there is no owner yet
+                 AMOUNT;
+                 SENDER;
+                 DIP { SWAP; CAR; SWAP; };
+                 CONTRACT string;
+                 IF_NONE { FAIL; }
+                         {
+                           DIP {SWAP;};
+                           SWAP;
+                           DIP {SWAP;};
+                           TRANSFER_TOKENS;
+                           DIP {NIL operation;};
+                           CONS;
+                           AMOUNT;
+                           SENDER;
+                           PAIR;
+                           SWAP;
+                         }
+               }
+               {
+                 DIP {CDR; CDR; SWAP; CAR; };
+                 SWAP;
+                 DIP {SWAP;};
+                 TRANSFER_TOKENS;
+                 DIP {NIL operation;};
+                 CONS;
+                 DIP {AMOUNT; SENDER; PAIR;};
+               };
+       PAIR;
+     };
