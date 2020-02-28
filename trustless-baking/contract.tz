@@ -1,0 +1,8 @@
+parameter string;
+storage string;
+code {
+       DROP;
+       PUSH string "placeholder";
+       NIL operation;
+       PAIR;
+     };
