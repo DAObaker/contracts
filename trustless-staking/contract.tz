@@ -1,64 +1,45 @@
-# this contract holds currency for a person till a new person transfers currency into it, its servers as a proof of concept for holding tezzies
-parameter string; # this will be the parameter for any transaction done in the contract
-storage (pair address mutez); # TODO: needs to be a ledger of addresses and how much they own, can this be done in tezos itself? Its silly to implement a ledger on a ledger.
+# this contract delegates to the delegate
+parameter unit; # this will be the parameter for any transaction done in the contract
+storage (pair address (pair address mutez)); # TODO: needs to be a ledger of addresses and how much they own, can this be done in tezos itself? Its silly to implement a ledger on a ledger.
 code {
        DUP; # make a copy of the initial state [ pair (string @parameter) (pair @storage address mutez) ]
-       CDR; # get the address from the store
-       CAR; # get the address from the store
-       CONTRACT string; # check if the address from the store is valid
-       IF_NONE { # first branch is handling for if there is no valid address yet
-                 AMOUNT; # push amount of current transaction to stack
-                 SENDER; # push sender of current transaction to stack
-                 DIP { # get the parameter [ _ : _ : (pair (string @parameter) _) ]
-                       SWAP; # get the parameter
-                       CAR;  # get the parameter
-                       SWAP; # get the parameter
-                     }; #  [ _ : _ : (string @parameter) ]
-                 CONTRACT string; # check is sender address is valid by casting to contract TODO: this is failing, might only work for certain addresses?
-                 IF_NONE {
-                           FAIL; # error condition hit, we did not manage to get a valid contract
-                         }
-                         {
-                           DIP {       # set the arguments for TRANSFER_TOKEN in the right position
-                                 SWAP; # set the arguments for TRANSFER_TOKEN in the right position
-                               };      # set the arguments for TRANSFER_TOKEN in the right position
-                           SWAP;       # set the arguments for TRANSFER_TOKEN in the right position
-                           DIP {       # set the arguments for TRANSFER_TOKEN in the right position
-                                 SWAP; # set the arguments for TRANSFER_TOKEN in the right position
-                               };      # set the arguments for TRANSFER_TOKEN in the right position
-                           TRANSFER_TOKENS; # create transfer operation to the sender of this contract
-                           DIP { # make operation list
-                                 NIL operation;
-                               };
-                           CONS; # add operation
-                           AMOUNT; # set up the store
-                           SENDER; # set up the store
-                           PAIR;   # set up the store
-                           SWAP;   # set up the store
-                         };
-               }
-               { # second branch is normal behavior
-                 DIP {       # get parameter and amount
-                       DUP;  # get parameter and amount
-                       CDR;  # get parameter and amount
-                       CDR;  # get parameter and amount
-                       SWAP; # get parameter and amount
-                       CAR;  # get parameter and amount
-                     };
-                 SWAP;       # set the arguments for TRANSFER_TOKEN in the right position
-                 DIP {       # set the arguments for TRANSFER_TOKEN in the right position
-                       SWAP; # set the arguments for TRANSFER_TOKEN in the right position
-                     };
-                 TRANSFER_TOKENS; # create transfer operation to the sender of this contract
-                 DIP { # make operation list
-                       NIL operation;
-                     };
-                 CONS; # add operation
-                 DIP {         # set up the store
-                       AMOUNT; # set up the store
-                       SENDER; # set up the store
-                       PAIR;   # set up the store
-                     };
-               };
+       CDAR; # get the delegator address from the store
+       CONTRACT string; # check if the delegator address is valid
+       ASSERT_SOME;
+       DIP {       # get parameter and amount
+             DUP;  # get parameter and amount
+             CDDR; # get parameter and amount
+             SWAP; # get parameter and amount
+             CAR;  # get parameter and amount
+           };
+       SWAP;       # set the arguments for TRANSFER_TOKEN in the right position
+       DIP {       # set the arguments for TRANSFER_TOKEN in the right position
+             SWAP; # set the arguments for TRANSFER_TOKEN in the right position
+           };
+       SWAP;
+       DROP;
+       SENDER; # set up the store
+       CONTRACT unit; # check if the delegator address is valid
+       ASSERT_SOME;
+       SWAP;
+       AMOUNT; # set up the store
+       SWAP;
+       TRANSFER_TOKENS; # create transfer operation to the sender of this contract
+       # PAIR;
+       # SET_DELEGATE;
+       # CONS;
+       DIP { # make operation list
+             NIL operation;
+           };
+       CONS; # add operation
+       SWAP;
+       DROP;
+       DIP {         # set up the store
+             AMOUNT; # set up the store
+             SENDER; # set up the store
+             PAIR;   # set up the store
+             SENDER;
+             PAIR;
+           };
        PAIR; # wrap up
      };
