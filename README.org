@@ -1,4 +1,4 @@
-# Contracts
-Michelson contracts
+DAObaker is an earnest effort to decentralize Tezos (XTZ) staking (aka baking) process through a set of self-enforcing smart contracts and provide block by block transparency and auditability, thus minimizing reliance on external discretionary entities.
 
-All rights reserved
+ Contents Licensed  (WTFPL)
+ http://www.wtfpl.net/about/
