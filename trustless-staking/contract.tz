@@ -1,45 +1,107 @@
-# this contract delegates to the delegate
-parameter unit; # this will be the parameter for any transaction done in the contract
-storage (pair address (pair address mutez)); # TODO: needs to be a ledger of addresses and how much they own, can this be done in tezos itself? Its silly to implement a ledger on a ledger.
+# this contract keeps tezos till requested back by the original sender, it sets the baker only once on intialisation
+parameter (or (unit %set) (unit %get)); # the parameter for the address send to
+storage (pair
+           (pair
+              (option %delegate key_hash) # change the delegate to this address
+              (list :records
+                 (pair :record # store the sender and the amount send
+                    (address %holder)
+                    (mutez %amount)))
+           )
+           (bool %delegated) # flag to see if we have delegated
+        );
 code {
-       DUP; # make a copy of the initial state [ pair (string @parameter) (pair @storage address mutez) ]
-       CDAR; # get the delegator address from the store
-       CONTRACT string; # check if the delegator address is valid
-       ASSERT_SOME;
-       DIP {       # get parameter and amount
-             DUP;  # get parameter and amount
-             CDDR; # get parameter and amount
-             SWAP; # get parameter and amount
-             CAR;  # get parameter and amount
-           };
-       SWAP;       # set the arguments for TRANSFER_TOKEN in the right position
-       DIP {       # set the arguments for TRANSFER_TOKEN in the right position
-             SWAP; # set the arguments for TRANSFER_TOKEN in the right position
-           };
+       SENDER;        # check if the contract is of the correct type
+       CONTRACT unit; # check if the contract is of the correct type
+       ASSERT_SOME;   # check if the contract is of the correct type
+       DROP;          # check if the contract is of the correct type
+       UNPAPPAIIR @parameter @% @%% @%% @%; # unwrap the address and amount
+       SWAP;     # position the address first
+       DUG 3;
+       IF_LEFT { # add address to list
+                 PUSH mutez 10000000; # if they do not do this the tezzies send will be lost
+                 AMOUNT;       # make sure there is a minimum of 10 tez
+                 IFCMPGE {}
+                         {
+                           PUSH string "send at least 10 tezos";
+                           FAILWITH;
+                         };
+                 SWAP;
+                 AMOUNT; # get the amount of the current transaction
+                 SENDER; # get the sender of the current transaction
+                 PAIR :record; # pair up the sender and amount for the store (this is the current "holder" of the contract)
+                 CONS;
+                 SWAP;
+                 NIL :operations operation; # make the operation list
+               }
+               { # get the money back
+                 AMOUNT;       # check if the sender transferred 0 tezzos
+                 PUSH mutez 0; # if they do not do this the tezzies send will be lost
+                 IFCMPEQ {}
+                         {
+                           PUSH string "Please make sure to send with zero tez if you want to retrieve";
+                           FAILWITH;
+                         };
+                 SWAP;
+                 NIL :operations operation;
+                 SWAP;
+                 DIP 3
+                     {
+                       NIL :records (pair :record (address %holder) (mutez %amount));
+                     };
+                 ITER { # loop trough the ledger and get the address(es)
+                        UNPAIR @% @%;
+                        DUP;
+                        SENDER;
+                        IFCMPEQ { # check if address matches one on file
+                                  CONTRACT unit;
+                                  ASSERT_SOME;  # bad state, should never happen
+                                  SWAP;
+                                  DIG 3;
+                                  DUP;
+                                  DUG 3;
+                                  TRANSFER_TOKENS; # transfer the tokens to the address from the store
+                                  DIP { SWAP; };
+                                  CONS;
+                                }
+                                { # if it does not match, reconstruct the record and put it in our new list
+                                  PAIR :record;
+                                  DUG 2;
+                                  DIP 2
+                                      {
+                                        CONS;
+                                      };
+                                };
+                      };
+               };
        SWAP;
-       DROP;
-       SENDER; # set up the store
-       CONTRACT unit; # check if the delegator address is valid
-       ASSERT_SOME;
-       SWAP;
-       AMOUNT; # set up the store
-       SWAP;
-       TRANSFER_TOKENS; # create transfer operation to the sender of this contract
-       # PAIR;
-       # SET_DELEGATE;
-       # CONS;
-       DIP { # make operation list
-             NIL operation;
-           };
-       CONS; # add operation
-       SWAP;
-       DROP;
-       DIP {         # set up the store
-             AMOUNT; # set up the store
-             SENDER; # set up the store
-             PAIR;   # set up the store
-             SENDER;
-             PAIR;
-           };
-       PAIR; # wrap up
+       DROP; # we don't need the parameter anymore
+       DIG 2; # check if have already delegated
+       DUP;   # stash a copy of the delegated flag
+       DUG 2; # stash a copy of the delegated flag
+       IF {
+          # we are not going to delegate, do nothing
+          }
+          {
+            DIG 3; # we are going to delegate
+            DUP;   # keep a copy of our delegate
+            DUG 4; # keep a copy of our delegate
+            SET_DELEGATE;
+            CONS; # add delegate operation to the operation list
+            DIP
+              { # set our flag to true, we have delegated
+                DROP;
+                PUSH bool True;
+              };
+          };
+       DIP 2        # plumbing to make the stack match store
+           {        # plumbing to make the stack match store
+             SWAP;  # plumbing to make the stack match store
+             PAIR;  # plumbing to make the stack match store
+           };       # plumbing to make the stack match store
+       DIP {        # plumbing to make the stack match store
+             SWAP;  # plumbing to make the stack match store
+             PAIR;  # plumbing to make the stack match store
+           };       # plumbing to make the stack match store
+       PAIR;        # plumbing to make the stack match store
      };
