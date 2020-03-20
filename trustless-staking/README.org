@@ -1,4 +1,4 @@
-* Trustless staking
+* DAO Baker - Automated Baking for Tezos
 
 This is a proof of concept, please do not deploy
 
