@@ -6,7 +6,4 @@ This is a proof of concept, please do not deploy
   Any tezos given to the contract will be delegated to the specified baker, and can be refunded using an operation.
    
 ** Who this is for?
-  anyone wishing to stake with the push of a button, later anyone who wants to have rewards issued automagically
-  
-** Credit due:
-  inspired by [[https://github.com/Cryptonomic/Smart-Contracts/blob/master/RFC/trustless-staking-token.md][Cryptonomics trustless staking token]] 
+ Anyone wishing to stake with the push of a button, later anyone who wants to have rewards issued automagically.
