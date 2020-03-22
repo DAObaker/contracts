@@ -2,33 +2,34 @@
 
 # DAO Baker
 
-**_Self amending DAO for staking economy_**
-> An upgradeable, onchain staking validator for Tezos community earning staking rewards while retaining custody of funds, with added features for effortless peer-to-peer participation and automation of the entire baking process and governance voting by Block Swap.
+**_Self-amending DAO for Staking Economy_**
+> An upgradeable, on-chain staking validator for the Tezos community earning staking rewards. Additional features include peer-to-peer participation and automation of the entire baking process and governance voting.
 
-Note: this is an evolving experiment  as a proof of concept - do not use it as is.
-This Standard Decentralized Autonomous Organization (DAO) Baker framework is written in Michelson to run on the Tezos blockchain.
+Note: this is an evolving experiment and a proof of concept.
+This standard Decentralised Autonomous Organisation (DAO) Baker is written in Michelson and runs on the Tezos blockchain.
 
 ## What is DAO Baker?
 
-DAO Baker is an earnest effort by **[Block Swap](https://blockswap.xyz)** to decentralize the **Tezos (XTZ) staking (a.k.a baking)** process through a set of self-enforcing smart contracts and provide block by block transparency and auditability, thus minimizing reliance on centralized discretionary staking providers.
+DAO Baker is an earnest effort by **[Block Swap](https://blockswap.xyz)** to decentralise the **Tezos (XTZ) staking (aka baking)** process through a set of self-enforcing smart contracts. This provides block by block transparency and auditability, thus minimising reliance on centralised discretionary staking providers.
 
-The purpose is to address the user experience and inefficiency plaguing the current staking process that limits the benefit only to niche technical crypto users. Our solution intends to provide a mainstream grade user experience for Tezos staking.
+The purpose is to address the user experience and inefficiency plaguing the current staking process that limits the benefit  to niche technical crypto users. Our solution intends to provide a mainstream user experience for Tezos staking.
 DAO Baker is a 100% open source project.
 
 ## Modules
 
 ### Baker Vault - Monetary Management
 - Delegation
-- Bonds (aka security deposit)
+- Bonds (security deposit)
 - Rewards & Payouts
 
 ### Protocol Politician  - Governance 
-- Profile & Registration
+- Registration & Profile 
 - Baker Rights & Management (TBA) 
 - Community Index (TBA)
 
 ### Relay Node - Bakery
-Hosted Validator Infrastructure & BDE (TBA)
+- BDE (TBA)
+- Validator Infrastructure (TBA)
 
 ## More Information
 
