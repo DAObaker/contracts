@@ -1,9 +1,0 @@
-* DAO Baker - Automated Baking for Tezos
-
-This is a proof of concept, please do not deploy
-
-** What does this do?
-  Any tezos given to the contract will be delegated to the specified baker, and can be refunded using an operation.
-   
-** Who this is for?
- Anyone wishing to stake with the push of a button, later anyone who wants to have rewards issued automagically.
