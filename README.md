@@ -54,23 +54,23 @@ Have any questions or feedback? Join the conversation on the [Telegram channel](
 
 ![Vault](https://i.ibb.co/h87mLK0/nitromethane-burning-inside-of-a-whoosh-bottle-in-super-slow-motion.gif)
 
-### Account Management 
+### Account Management   
 
-The current implementation of the DAOBaker **_Vault: Account Management_** works as follows:
+The current implementation of the **Vault** works as follows:
 
-Allows users to make **_deposits and stake XTZ by simply sending XTZ to the contract_**, and the contract will automate the account generation and rewards allocation to that address. Account addresses are counterfactual based on the initial user deposit key and can be safely deployed by anyone using the vault contract.  A user can make **withdrawals partially or complete** that will automatically redeem and transfer the account balance XTZ to the originated address. A user may cancel the delegation at any time they wish and withdraw their balance with accumulated rewards.
+Allows users to make **_deposits and stake XTZ by simply sending XTZ to the contract_**, and the contract will automate the account generation and rewards allocation to that address. Account addresses are counterfactual based on the initial user deposit key and can be safely deployed by anyone using the vault contract. A user can make withdrawals partially or completely. When withdrawn completely, the user automatically redeems and transfers the account balance XTZ to the originated address. A user may cancel the delegation at any time should they wish and withdraw their balance with accumulated rewards.
 
-There is an account recovery **Escape Hatch** option built-in, that can be used in the event that a user has lost access to their account or the contract has been compromised. Additional features will be rolled out incrementally for the vault module, such as ability to receive custom periodical payouts and portfolio management features.  
+There is also an account recovery **Escape Hatch** option built-in. This can be used in the event that a user has lost access to their account or the contract has been compromised. Additional features will be rolled out incrementally for the vault module, such as the ability to receive custom periodical payouts and portfolio management features.
 
 
 #### [See deployed contract here](https://carthagenet.tzstats.com/KT1J7VKG2JubhZKczCdktQGRhcieTRHbvJfa)
 
 | Key Functions|  Description |
 | --- | --- |
-|  `deposit` | Allows the user to **deposit  XTZ** (multiples of 1 xtz) to the contract account. In the case of new users, the contract will automatically generate and assign an account for them.|
-| `withdrawal` | Allows users to make **XTZ withdrawals** at any time of their choosing, by using the contract withdrawal function (currently multiple of 1 xtz). In case of performing **complete withdrawal**, the account will get closed. |
-| `close_account` |This handles the **final settlement** of the account, and also gets triggered in the event of complete withdrawal of XTZ from the account. |
-| `distribute` | Handles **payout of staking rewards** to the designated accounts and also handles final settlement on account closing events.|
+|  `deposit` | Allows the user to **deposit XTZ** (multiples of 1 XTZ) to the contract account. In the case of new users, the contract will automatically generate and assign an account for them.|
+| `withdrawal` | Allows the user to **withdraw XTZ** at any time by using the contract withdrawal function (multiples of 1 XTZ). In case of performing a _complete withdrawal_, the account will get closed.|
+| `close_account` | Handles the **final settlement** of the account and also gets triggered in the event of a complete withdrawal of XTZ from the account.|
+| `distribute` | Handles the **payout of staking rewards** to designated accounts and also handles final settlement on account closing events. |
 
 
 ## Licensing
