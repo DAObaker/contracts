@@ -60,7 +60,7 @@ The current implementation of the **Vault** works as follows:
 
 Allows users to make **_deposits and stake XTZ by simply sending XTZ to the contract_**, and the contract will automate the account generation and rewards allocation to that address. Account addresses are counterfactual based on the initial user deposit key and can be safely deployed by anyone using the vault contract. A user can make withdrawals partially or completely. When withdrawn completely, the user automatically redeems and transfers the account balance XTZ to the originated address. A user may cancel the delegation at any time should they wish and withdraw their balance with accumulated rewards.
 
-There is also an account recovery option built-in **Escape Hatch**. This can be used in the event that a user has lost access to their account or the contract has been compromised. Additional features will be rolled out in phases for the **Vault**, such as the ability to receive custom periodical payouts and portfolio management features.
+There is also an account recovery option built-in "**Escape Hatch**". This can be used in the event that a user has lost access to their account or the contract has been compromised. Additional features will be rolled out in phases for the **Vault**, such as the ability to receive custom periodical payouts and portfolio management features.
 
 
 #### [See deployed contract here](https://carthagenet.tzstats.com/KT1J7VKG2JubhZKczCdktQGRhcieTRHbvJfa)
@@ -69,7 +69,7 @@ There is also an account recovery option built-in **Escape Hatch**. This can be 
 | --- | --- |
 |  `deposit` | Allows the user to **deposit XTZ** (multiples of 1 XTZ) to the contract account. In the case of new users, the contract will automatically generate and assign an account for them.|
 | `withdrawal` | Allows the user to **withdraw XTZ** at any time by using the contract withdrawal function (multiples of 1 XTZ). In case of performing a _complete withdrawal_, the account will get closed.|
-| `close_account` | Handles the **final settlement** of the account and also gets triggered in the event of a complete withdrawal of XTZ from the account.|
+| `close_account` | Handles the **final settlement of the account** and also gets triggered in the event of a complete withdrawal of XTZ from the account.|
 | `distribute` | Handles the **payout of staking rewards** to designated accounts and also handles final settlement on account closing events. |
 
 
