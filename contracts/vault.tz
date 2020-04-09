@@ -1,6 +1,7 @@
 # this contract acts as a wallet
-parameter (or (or (or (mutez %withdrawal) (unit %close_account)) (unit %distribute)) (unit %disposit));
-storage (or (map address mutez) (option %delegate key_hash));
+parameter (or (or (or (or (mutez %withdrawal) (unit %close_account)) (unit %distribute)) (unit %disposit)) (unit %slot));
+storage (or (map address (pair :account mutez %amount (map address %slot mutez %amount))) (option %delegate key_hash));
+# perhaps change it so its either a map of the addresses a person has delegated to or nothing
 code {
        # check if the user is sending from a contract with type unit
        SENDER;        # check if the contract is of the correct type
