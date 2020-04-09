@@ -225,6 +225,14 @@ code {
                                  };
                        };
      } { # entrypoints involving slots
+             # assuming a slot must be created, slot management will be done on the slot contract
+             PUSH mutez 8000000000; # push 8000 tez
+             AMOUNT; 
+             IFCMPGE {}
+                     {
+                       PUSH string "you need to send at least 8000 tezos";
+                       FAILWITH;
+                     };
      };
      LEFT (option key_hash);
      SWAP;
