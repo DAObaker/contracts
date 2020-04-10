@@ -1,6 +1,27 @@
-# this contract acts as a wallet
-parameter (or (or (or (or (mutez %withdrawal) (unit %close_account)) (unit %distribute)) (unit %disposit)) (unit %slot));
-storage (or (map address (pair :account mutez %amount (map address %slot mutez %amount))) (option %delegate key_hash));
+parameter (or
+             (or
+                (or
+                   (or
+                      (mutez %withdrawal)
+                      (unit %close_account))
+                   (unit %distribute))
+                (unit %deposit))
+             (unit %slot));
+storage (or
+           (pair
+              (map :account
+                 address
+                 mutez
+              )
+              (map :slots_account
+                 address
+                 (list :slots
+                    address
+                 )
+              )
+           )
+           (option %delegate key_hash)
+        );
 # perhaps change it so its either a map of the addresses a person has delegated to or nothing
 code {
        # check if the user is sending from a contract with type unit
@@ -10,7 +31,6 @@ code {
        DROP;          # check if the contract is of the correct type
        # unwrap
        UNPAIR @% @%%;        # unwrap storage / parameter pair
-
        # init
        SWAP;
        IF_RIGHT {
@@ -28,213 +48,214 @@ code {
        SWAP;
        # actual program starts here
        IF_LEFT { # entrypoints involving non-slot related behavior
-               IF_LEFT { # entrypoints involving 0tz amount
-                         # fail if the user tries to use these entrypoints with any amount of money in the transaction
-                         PUSH mutez 0; # push 0 tez
-                         AMOUNT;       # get the amount the user has
-                         IFCMPEQ {
-                                 }
-                                 {
-                                   PUSH string "Transaction needs to be 0tz"; # you cannot take money out of your account by sending money into it
-                                   FAILWITH;
-                                 };
-                         IF_LEFT { # operations involving a multiple of minimum xtz
-                                   IF_LEFT { # take from the walet
-                                             SWAP;
-                                             DUP;
-                                             SENDER;
-                                             GET @account_balance;
-                                             IF_SOME { # user has an account
-                                                       # create and set up a copy of the account balance for later
-                                                       DUP;
-                                                       DUG 1;
-                                                       DIG 3;
-                                                       DUP;
-                                                       DUG 2;
-                                                       # compare credit to requested amount
-                                                       IFCMPLE { # user has enough credit
-                                                                 # check if the user is requesting at least 1 TZ (maybe multiples?)
-                                                                 DUP;
-                                                                 PUSH @one_tez mutez 1000000; # push 1 tez
-                                                                 SWAP;
-                                                                 EDIV;
-                                                                 ASSERT_SOME;
-                                                                 CDR @remainder;
-                                                                 PUSH mutez 0; # push 1 tez
-                                                                 COMPARE;
-                                                                 EQ;
-                                                                 IF { # user has requested a multiple of specified amount
-                                                                    }
-                                                                    { # user has requested an invalid amount
-                                                                      PUSH string "you can only withdrawal a multiple of 1tz!";
-                                                                      FAILWITH;
-                                                                    };
-                                                                 # create the transaction
-                                                                 DUP;
-                                                                 SENDER;
-                                                                 CONTRACT unit;
-                                                                 ASSERT_SOME;   # unwrap
-                                                                 SWAP;
-                                                                 PUSH unit Unit;
-                                                                 TRANSFER_TOKENS;
-                                                                 # add transaction to operation stack
-                                                                 DIG 4;
-                                                                 SWAP;
-                                                                 CONS;
-                                                                 DUG 3;
-                                                                 # update the map
-                                                                 SWAP;
-                                                                 SUB @new_balance;
-                                                                 DUP;
-                                                                 PUSH @zero_tez mutez 0; # push 0 tez
-                                                                 COMPARE;
-                                                                 LT @user_has_tez;
-                                                                 IF { # update users balance
-                                                                      SOME; # TODO does this work?
-                                                                      SENDER;
-                                                                      UPDATE;
-                                                                    }
-                                                                    { # user has zero or less, close account
-                                                                      DROP;
-                                                                      NONE mutez;
-                                                                      SENDER;
-                                                                      UPDATE;
-                                                                    };
-                                                               }
-                                                               { # user does not have enough credit
-                                                                 PUSH string "you don't have that much stored with us!";
-                                                                 FAILWITH;
-                                                               };
-                                                     }
-                                                     { # user does not have an account, notify the user of this and exit
-                                                       PUSH string "your address does not have any money associated with it!";
-                                                       FAILWITH;
-                                                     };
-                                           }
-                                           { # withdrawal all from users account and close account
-                                             DROP; # no argument is given
-                                             DUP;
-                                             SENDER;
-                                             GET;
-                                             IF_SOME {
-                                                       # set the withdrawal all operation
-                                                       SENDER;
-                                                       CONTRACT unit;
-                                                       ASSERT_SOME;
-                                                       SWAP;
-                                                       PUSH unit Unit;
-                                                       TRANSFER_TOKENS;
-                                                       DIG 2;
-                                                       SWAP;
-                                                       CONS;
-                                                       # close their account
-                                                       SWAP;
-                                                       NONE mutez;
-                                                       SENDER;
-                                                       UPDATE;
-                                                     }
-                                                     {
-                                                       PUSH string "you do not appear to have any funds with us";
-                                                       FAILWITH;
-                                                     };
-                                           };
-                                 }
-                                 { # TODO distribute entrypoint
-                                   DROP; # no argument is given
-                                   # get the amount to distribute
-                                   DUP;
-                                   SENDER;
-                                   GET @divident;
-                                   # close the account of the benifactor
-                                   SWAP;
-                                   NONE mutez;
-                                   SENDER;
-                                   UPDATE;
-                                   SWAP;
-                                   IF_SOME { # user has account and wants to distribute all their funds
-                                             SWAP;
-                                             MAP {
-                                                   CDR @account_balance; # we dont need the address
-                                                   # first save a copy of the account balance
-                                                   DUP;
-                                                   DUG 2;
-                                                   SWAP;
-                                                   DUP;
-                                                   DUG 2;
-                                                   BALANCE @total;
-                                                   SUB @total_trunc;
-                                                   # NOTE put a check here if you want to have a minimum reward
-                                                   # calculate how much this address gets
-                                                   # get a copy of the total
-                                                   PUSH nat 1000000; # we round down to 1tz granarity for our calculations
-                                                   SWAP;
-                                                   EDIV;
-                                                   ASSERT_SOME;
-                                                   CAR @total_tez;
-                                                   SWAP;
-                                                   EDIV;
-                                                   ASSERT_SOME;
-                                                   CAR @stake;
-                                                   SWAP;
-                                                   # keep a copy of our divident
-                                                   DUP;
-                                                   DUG 3;
-                                                   MUL @reward;
-                                                   PUSH nat 1000000;
-                                                   SWAP;
-                                                   EDIV;
-                                                   ASSERT_SOME;
-                                                   CAR @compensated_reward;
-                                                   ADD;
-                                                 };
-                                             SWAP;
-                                             DROP;
-                                           }
-                                           {
-                                             PUSH string "you do not appear to have any funds to distribute";
-                                             FAILWITH;
-                                           };
-                                 };
-                       }
-                       { # add to the wallet
-                         # check if the user has over 1 TZ in this transaction
-                         PUSH mutez 1000000; # push 1 tez
-                         AMOUNT;       # get the amount the user has
-                         IFCMPGE {}
-                                 {
-                                   PUSH string "you need to send at least 1 tezos";
-                                   FAILWITH;
-                                 };
-                         # drop the parameter, we don't use it here
-                         DROP; # we don't need the unwrapped "unit" from the parameter
-                         DUP;
-                         SENDER;
-                         GET;
-                         IF_SOME {
-                                   AMOUNT;
-                                   ADD;
-                                   SOME;
-                                   SENDER;
-                                   UPDATE;
-                                 }
-                                 { # user does not yet have an account, make one.
-                                   AMOUNT;
-                                   SOME;
-                                   SENDER;
-                                   UPDATE;
-                                 };
-                       };
-     } { # entrypoints involving slots
-             # assuming a slot must be created, slot management will be done on the slot contract
-             PUSH mutez 8000000000; # push 8000 tez
-             AMOUNT; 
-             IFCMPGE {}
-                     {
-                       PUSH string "you need to send at least 8000 tezos";
-                       FAILWITH;
-                     };
-     };
-     LEFT (option key_hash);
-     SWAP;
-     PAIR; # pair up the operations and store
+                 IF_LEFT { # entrypoints involving 0tz amount
+                           # fail if the user tries to use these entrypoints with any amount of money in the transaction
+                           PUSH mutez 0; # push 0 tez
+                           AMOUNT;       # get the amount the user has
+                           IFCMPEQ {
+                                   }
+                                   {
+                                     PUSH string "Transaction needs to be 0tz"; # you cannot take money out of your account by sending money into it
+                                     FAILWITH;
+                                   };
+                           IF_LEFT { # operations involving a multiple of minimum xtz
+                                     IF_LEFT { # take from the walet
+                                               SWAP;
+                                               DUP;
+                                               SENDER;
+                                               GET @account_balance;
+                                               IF_SOME { # user has an account
+                                                         # create and set up a copy of the account balance for later
+                                                         DUP;
+                                                         DUG 1;
+                                                         DIG 3;
+                                                         DUP;
+                                                         DUG 2;
+                                                         # compare credit to requested amount
+                                                         IFCMPLE { # user has enough credit
+                                                                   # check if the user is requesting at least 1 TZ (maybe multiples?)
+                                                                   DUP;
+                                                                   PUSH @one_tez mutez 1000000; # push 1 tez
+                                                                   SWAP;
+                                                                   EDIV;
+                                                                   ASSERT_SOME;
+                                                                   CDR @remainder;
+                                                                   PUSH mutez 0; # push 1 tez
+                                                                   COMPARE;
+                                                                   EQ;
+                                                                   IF { # user has requested a multiple of specified amount
+                                                                      }
+                                                                      { # user has requested an invalid amount
+                                                                        PUSH string "you can only withdrawal a multiple of 1tz!";
+                                                                        FAILWITH;
+                                                                      };
+                                                                   # create the transaction
+                                                                   DUP;
+                                                                   SENDER;
+                                                                   CONTRACT unit;
+                                                                   ASSERT_SOME;   # unwrap
+                                                                   SWAP;
+                                                                   PUSH unit Unit;
+                                                                   TRANSFER_TOKENS;
+                                                                   # add transaction to operation stack
+                                                                   DIG 4;
+                                                                   SWAP;
+                                                                   CONS;
+                                                                   DUG 3;
+                                                                   # update the map
+                                                                   SWAP;
+                                                                   SUB @new_balance;
+                                                                   DUP;
+                                                                   PUSH @zero_tez mutez 0; # push 0 tez
+                                                                   COMPARE;
+                                                                   LT @user_has_tez;
+                                                                   IF { # update users balance
+                                                                        SOME; # TODO does this work?
+                                                                        SENDER;
+                                                                        UPDATE;
+                                                                      }
+                                                                      { # user has zero or less, close account
+                                                                        DROP;
+                                                                        NONE mutez;
+                                                                        SENDER;
+                                                                        UPDATE;
+                                                                      };
+                                                                 }
+                                                                 { # user does not have enough credit
+                                                                   PUSH string "you don't have that much stored with us!";
+                                                                   FAILWITH;
+                                                                 };
+                                                       }
+                                                       { # user does not have an account, notify the user of this and exit
+                                                         PUSH string "your address does not have any money associated with it!";
+                                                         FAILWITH;
+                                                       };
+                                             }
+                                             { # withdrawal all from users account and close account
+                                               DROP; # no argument is given
+                                               DUP;
+                                               SENDER;
+                                               GET;
+                                               IF_SOME {
+                                                         # set the withdrawal all operation
+                                                         SENDER;
+                                                         CONTRACT unit;
+                                                         ASSERT_SOME;
+                                                         SWAP;
+                                                         PUSH unit Unit;
+                                                         TRANSFER_TOKENS;
+                                                         DIG 2;
+                                                         SWAP;
+                                                         CONS;
+                                                         # close their account
+                                                         SWAP;
+                                                         NONE mutez;
+                                                         SENDER;
+                                                         UPDATE;
+                                                       }
+                                                       {
+                                                         PUSH string "you do not appear to have any funds with us";
+                                                         FAILWITH;
+                                                       };
+                                             };
+                                   }
+                                   { # TODO distribute entrypoint
+                                     DROP; # no argument is given
+                                     # get the amount to distribute
+                                     DUP;
+                                     SENDER;
+                                     GET @divident;
+                                     # close the account of the benifactor
+                                     SWAP;
+                                     NONE mutez;
+                                     SENDER;
+                                     UPDATE;
+                                     SWAP;
+                                     IF_SOME { # user has account and wants to distribute all their funds
+                                               SWAP;
+                                               MAP {
+                                                     CDR @account_balance; # we dont need the address
+                                                     # first save a copy of the account balance
+                                                     DUP;
+                                                     DUG 2;
+                                                     SWAP;
+                                                     DUP;
+                                                     DUG 2;
+                                                     BALANCE @total;
+                                                     SUB @total_trunc;
+                                                     # NOTE put a check here if you want to have a minimum reward
+                                                     # calculate how much this address gets
+                                                     # get a copy of the total
+                                                     PUSH nat 1000000; # we round down to 1tz granarity for our calculations
+                                                     SWAP;
+                                                     EDIV;
+                                                     ASSERT_SOME;
+                                                     CAR @total_tez;
+                                                     SWAP;
+                                                     EDIV;
+                                                     ASSERT_SOME;
+                                                     CAR @stake;
+                                                     SWAP;
+                                                     # keep a copy of our divident
+                                                     DUP;
+                                                     DUG 3;
+                                                     MUL @reward;
+                                                     PUSH nat 1000000;
+                                                     SWAP;
+                                                     EDIV;
+                                                     ASSERT_SOME;
+                                                     CAR @compensated_reward;
+                                                     ADD;
+                                                   };
+                                               SWAP;
+                                               DROP;
+                                             }
+                                             {
+                                               PUSH string "you do not appear to have any funds to distribute";
+                                               FAILWITH;
+                                             };
+                                   };
+                         }
+                         { # add to the wallet
+                           # check if the user has over 1 TZ in this transaction
+                           PUSH mutez 1000000; # push 1 tez
+                           AMOUNT;       # get the amount the user has
+                           IFCMPGE {}
+                                   {
+                                     PUSH string "you need to send at least 1 tezos";
+                                     FAILWITH;
+                                   };
+                           # drop the parameter, we don't use it here
+                           DROP; # we don't need the unwrapped "unit" from the parameter
+                           DUP;
+                           SENDER;
+                           GET;
+                           IF_SOME {
+                                     AMOUNT;
+                                     ADD;
+                                     SOME;
+                                     SENDER;
+                                     UPDATE;
+                                   }
+                                   { # user does not yet have an account, make one.
+                                     AMOUNT;
+                                     SOME;
+                                     SENDER;
+                                     UPDATE;
+                                   };
+                         };
+               }
+               {  # entrypoints involving slots
+                 # assuming a slot must be created, slot management will be done on the slot contract
+                 PUSH mutez 8000000000; # push 8000 tez
+                 AMOUNT;
+                 IFCMPGE {}
+                         {
+                           PUSH string "you need to send at least 8000 tezos";
+                           FAILWITH;
+                         };
+               };
+       LEFT (option key_hash);
+       SWAP;
+       PAIR; # pair up the operations and store
      }
