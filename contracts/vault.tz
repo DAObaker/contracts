@@ -9,7 +9,7 @@ parameter (or
              (unit %slot));
 storage (or
            (pair
-              (map :account
+              (map :vault_account
                  address
                  mutez
               )
@@ -38,7 +38,9 @@ code {
                   NIL operation;
                   SWAP;
                   CONS;
-                  EMPTY_MAP address mutez;
+                  EMPTY_MAP :slots_account address (list :slots address);
+                  EMPTY_MAP :vault_account address mutez;
+                  PAIR;
                   SWAP;
                 }
                 {
@@ -48,6 +50,11 @@ code {
        SWAP;
        # actual program starts here
        IF_LEFT { # entrypoints involving non-slot related behavior
+                 SWAP;
+                 DUP;
+                 DUG 3;
+                 CAR;
+                 SWAP;
                  IF_LEFT { # entrypoints involving 0tz amount
                            # fail if the user tries to use these entrypoints with any amount of money in the transaction
                            PUSH mutez 0; # push 0 tez
@@ -244,8 +251,14 @@ code {
                                      UPDATE;
                                    };
                          };
+                 # reintergrate the slotsmap
+                 DIG 2;
+                 CDR;
+                 SWAP;
+                 PAIR;
                }
                {  # entrypoints involving slots
+                 DROP;
                  # assuming a slot must be created, slot management will be done on the slot contract
                  PUSH mutez 8000000000; # push 8000 tez
                  AMOUNT;
