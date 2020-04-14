@@ -6,7 +6,7 @@ parameter (or
                       (unit %close_account))
                    (unit %distribute))
                 (unit %deposit))
-             (unit %slot));
+             (option %slot key_hash));
 storage (or
            (pair
               (map :vault_account
@@ -166,7 +166,7 @@ code {
                                                        };
                                              };
                                    }
-                                   { # TODO distribute entrypoint
+                                   { # distribution endpoint
                                      DROP; # no argument is given
                                      # get the amount to distribute
                                      DUP;
@@ -180,40 +180,40 @@ code {
                                      SWAP;
                                      IF_SOME { # user has account and wants to distribute all their funds
                                                SWAP;
-                                               MAP {
-                                                     CDR @account_balance; # we dont need the address
-                                                     # first save a copy of the account balance
-                                                     DUP;
-                                                     DUG 2;
-                                                     SWAP;
-                                                     DUP;
-                                                     DUG 2;
-                                                     BALANCE @total;
-                                                     SUB @total_trunc;
-                                                     # NOTE put a check here if you want to have a minimum reward
-                                                     # calculate how much this address gets
-                                                     # get a copy of the total
-                                                     PUSH nat 1000000; # we round down to 1tz granarity for our calculations
-                                                     SWAP;
-                                                     EDIV;
-                                                     ASSERT_SOME;
-                                                     CAR @total_tez;
-                                                     SWAP;
-                                                     EDIV;
-                                                     ASSERT_SOME;
-                                                     CAR @stake;
-                                                     SWAP;
-                                                     # keep a copy of our divident
-                                                     DUP;
-                                                     DUG 3;
-                                                     MUL @reward;
-                                                     PUSH nat 1000000;
-                                                     SWAP;
-                                                     EDIV;
-                                                     ASSERT_SOME;
-                                                     CAR @compensated_reward;
-                                                     ADD;
-                                                   };
+                                               MAP :vault_account {
+                                                                    CDR @account_balance; # we dont need the address
+                                                                    # first save a copy of the account balance
+                                                                    DUP;
+                                                                    DUG 2;
+                                                                    SWAP;
+                                                                    DUP;
+                                                                    DUG 2;
+                                                                    BALANCE @total;
+                                                                    SUB @total_trunc;
+                                                                    # NOTE put a check here if you want to have a minimum reward
+                                                                    # calculate how much this address gets
+                                                                    # get a copy of the total
+                                                                    PUSH nat 1000000; # we round down to 1tz granarity for our calculations
+                                                                    SWAP;
+                                                                    EDIV;
+                                                                    ASSERT_SOME;
+                                                                    CAR @total_tez;
+                                                                    SWAP;
+                                                                    EDIV;
+                                                                    ASSERT_SOME;
+                                                                    CAR @stake;
+                                                                    SWAP;
+                                                                    # keep a copy of our divident
+                                                                    DUP;
+                                                                    DUG 3;
+                                                                    MUL @reward;
+                                                                    PUSH nat 1000000;
+                                                                    SWAP;
+                                                                    EDIV;
+                                                                    ASSERT_SOME;
+                                                                    CAR @compensated_reward;
+                                                                    ADD;
+                                                                  };
                                                SWAP;
                                                DROP;
                                              }
@@ -257,8 +257,7 @@ code {
                  SWAP;
                  PAIR;
                }
-               {  # entrypoints involving slots
-                 DROP;
+               { # entrypoints involving slots
                  # assuming a slot must be created, slot management will be done on the slot contract
                  PUSH mutez 8000000000; # push 8000 tez
                  AMOUNT;
@@ -267,6 +266,74 @@ code {
                            PUSH string "you need to send at least 8000 tezos";
                            FAILWITH;
                          };
+                 SENDER;
+                 AMOUNT;
+                 DIG 2;
+                 CREATE_CONTRACT {
+                                   parameter unit;
+                                   storage address;
+                                   code {
+                                          CDR;
+                                          SENDER;
+                                          IFCMPEQ {
+                                                    SENDER;
+                                                    SENDER;
+                                                    CONTRACT unit;
+                                                    ASSERT_SOME;   # unwrap
+                                                    BALANCE @total;
+                                                    PUSH unit Unit;
+                                                    TRANSFER_TOKENS;
+                                                    NIL operation;
+                                                    SWAP;
+                                                    CONS;
+                                                    PAIR;
+                                                  }
+                                                  {
+                                                    PUSH string "only owner can do this!";
+                                                    FAILWITH;
+                                                  };
+                                        };
+                                 };
+                 DIP {
+                       SWAP;
+                       DUP;
+                       CDR;
+                       SENDER;
+                       GET;
+                       # check if user has slots
+                       IF_SOME { # user has slots, add slot
+                                 DIG 2;
+                                 CONS;
+                                 SWAP;
+                                 DUP;
+                                 CDR;
+                                 DIG 2;
+                                 SOME;
+                                 SENDER;
+                                 UPDATE;
+                                 SWAP;
+                                 CAR;
+                                 PAIR;
+                               }
+                               { # user does not have slots, add slot
+                                 DUP;
+                                 CDR;
+                                 DIG 2;
+                                 NIL :slots address;
+                                 SWAP;
+                                 CONS;
+                                 SOME;
+                                 SENDER;
+                                 UPDATE;
+                                 SWAP;
+                                 CAR;
+                                 PAIR;
+                               };
+                     };
+                 DIG 2;
+                 SWAP;
+                 CONS;
+                 SWAP;
                };
        LEFT (option key_hash);
        SWAP;
