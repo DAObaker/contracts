@@ -71,6 +71,7 @@ There is also an account recovery option built-in "**Escape Hatch**". This can b
 | `withdrawal` | Allows the user to **withdraw XTZ** at any time by using the contract withdrawal function (multiples of 1 XTZ). In case of performing a _complete withdrawal_, the account will get closed.|
 | `close_account` | Handles the **final settlement of the account** and also gets triggered in the event of a complete withdrawal of XTZ from the account.|
 | `distribute` | Handles the **payout of staking rewards** to designated accounts and also handles final settlement on account closing events. |
+| `slot` | Handles the **creation of a new slot**. Once a person transfer sufficient amount of tez with this entrypoint as argument and a baker address, the slot contract will be created which delegates their tez to the specified baker. |
 
 
 ## Licensing
