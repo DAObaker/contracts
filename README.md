@@ -62,7 +62,7 @@ The whole process takes place on-chain. Hence, this is a very simple but very di
 
 #### [A detailed writeup on staking process is available here](https://medium.com/@blockswap_hq/staking-economy-in-visible-dance-8ab7c6eb5fbd)
 
-**_Key Components of Stake Management:_**👇
+**Key Components of Stake Management:** 👇
 
   
 ## Vault - Account Management   
