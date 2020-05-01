@@ -78,13 +78,15 @@ code {
        SWAP;
        #   </checks>
        #   <main>
-       IF_LEFT { # entrypoints involving non-slot related behavior
+       IF_LEFT { # %withdrawal, %close_account, %distribute, %desposit, %transfer, entrypoints
+                 # entrypoints involving the dtz token
                  SWAP;
                  DUP;
                  DUG 3;
                  CAR;
                  SWAP;
-                 IF_LEFT { # entrypoints involving 0tz amount
+                 IF_LEFT { # %withdrawal, #close_account, %distribute, entrypoints
+                           # entrypoints involving 0tz amount
                            # fail if the user tries to use these entrypoints with any amount of money in the transaction
                            PUSH mutez 0; # push 0 tez
                            AMOUNT;       # get the amount the user has
@@ -94,8 +96,10 @@ code {
                                      PUSH string "Transaction needs to be 0tz"; # you cannot take money out of your account by sending money into it
                                      FAILWITH;
                                    };
-                           IF_LEFT { # operations involving a multiple of minimum xtz
-                                     IF_LEFT { # take from the walet
+                           IF_LEFT { # %withdrawal, #close_account, entrypoints
+                                     # operations involving a multiple of minimum xtz
+                                     IF_LEFT { # %withdrawal, entrypoints
+                                               # take from the walet
                                                SWAP;
                                                DUP;
                                                SENDER;
@@ -167,7 +171,8 @@ code {
                                                          FAILWITH;
                                                        };
                                              }
-                                             { # withdrawal all from users account and close account
+                                             { # %close_account entrypoint
+                                               # withdrawal all from users account and close account
                                                DROP; # no argument is given
                                                DUP;
                                                SENDER;
@@ -195,7 +200,7 @@ code {
                                                        };
                                              };
                                    }
-                                   { # distribution endpoint
+                                   { # %distribute endpoint
                                      DROP; # no argument is given
                                      # get the amount to distribute
                                      DUP;
@@ -252,7 +257,8 @@ code {
                                              };
                                    };
                          }
-                         { # add to the wallet
+                         { # %desposit, %transfer entrypoints
+                           # add to the wallet
                            # check if the user has over 1 TZ in this transaction
                            PUSH mutez 1000000; # push 1 tez
                            AMOUNT;       # get the amount the user has
@@ -286,8 +292,8 @@ code {
                  SWAP;
                  PAIR;
                }
-               { # %slots, %get_slots, entrypoints
-                 IF_LEFT { # user wants to get slots of given addres
+               { # %get_slots, %slot, entrypoints
+                 IF_LEFT { # %get_slots entrypoint
                            # fail if the user tries to use these entrypoints with any amount of money in the transaction
                            PUSH mutez 0; # push 0 tez
                            AMOUNT;       # get the amount the user has
@@ -311,7 +317,7 @@ code {
                                      FAILWITH;
                                    };
                          }
-                         {
+                         { # %slot entrypoint
                            # assuming a slot must be created, slot management will be done on the slot contract
                            PUSH mutez 8000000000; # push 8000 tez
                            AMOUNT;
