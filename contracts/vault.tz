@@ -200,9 +200,9 @@ code {
                                                        };
                                              };
                                    }
-                                   { # %distribute endpoint
-                                     DROP; # no argument is given
+                                   { # %distribute, endpoints
                                      # get the amount to distribute
+                                     DROP; # no argument is given
                                      DUP;
                                      SENDER;
                                      GET @divident;
@@ -212,7 +212,8 @@ code {
                                      SENDER;
                                      UPDATE;
                                      SWAP;
-                                     IF_SOME { # user has account and wants to distribute all their funds
+                                     IF_SOME { # %distribute endpoint
+                                               # user has account and wants to distribute all their funds
                                                SWAP;
                                                MAP :vault_account {
                                                                     CDR @account_balance; # we dont need the address
@@ -259,28 +260,79 @@ code {
                          }
                          { # %desposit, %transfer entrypoints
                            # add to the wallet
-                           # check if the user has over 1 TZ in this transaction
-                           PUSH mutez 1000000; # push 1 tez
-                           AMOUNT;       # get the amount the user has
-                           IFCMPGE {}
-                                   {
-                                     PUSH string "you need to send at least 1 tezos";
-                                     FAILWITH;
-                                   };
-                           # drop the parameter, we don't use it here
-                           DROP; # we don't need the unwrapped "unit" from the parameter
-                           DUP;
-                           SENDER;
-                           GET;
-                           IF_SOME {
-                                     AMOUNT;
-                                     ADD;
-                                     SOME;
+                           IF_LEFT {
+                                     # check if the user has over 1 TZ in this transaction
+                                     PUSH mutez 1000000; # push 1 tez
+                                     AMOUNT;       # get the amount the user has
+                                     IFCMPGE {}
+                                             {
+                                               PUSH string "You need to send at least 1 tezos";
+                                               FAILWITH;
+                                             };
+                                     # drop the parameter, we don't use it here
+                                     DROP; # we don't need the unwrapped "unit" from the parameter
+                                     DUP;
                                      SENDER;
-                                     UPDATE;
+                                     GET;
+                                     IF_SOME {
+                                               AMOUNT;
+                                               ADD;
+                                               SOME;
+                                               SENDER;
+                                               UPDATE;
+                                             }
+                                             { # user does not yet have an account, make one.
+                                               AMOUNT;
+                                               SOME;
+                                               SENDER;
+                                               UPDATE;
+                                             };
                                    }
-                                   { # user does not yet have an account, make one.
-                                     AMOUNT;
+                                   { # %transfer endpoint
+                                     SWAP;
+                                     DUP;
+                                     DUG 2;
+                                     SENDER;
+                                     GET;
+                                     IF_SOME {
+                                             }
+                                             {
+                                               PUSH string "You do not have an account";
+                                               FAILWITH;
+                                             };
+                                     SWAP;
+                                     DUP;
+                                     DUG 2;
+                                     CDR;
+                                     SUB; # fails if negative
+                                     # GT;
+                                     # IF {
+                                     #    }
+                                     #    {
+                                     #      PUSH string "You lack the funds";
+                                     #      FAILWITH;
+                                     #    };
+                                     SWAP;
+                                     UNPAIR;
+                                     DIG 3;
+                                     DUP;
+                                     DUG 3;
+                                     SWAP;
+                                     DUP;
+                                     DUG 3;
+                                     GET;
+                                     IF_SOME {
+                                               ADD;
+                                               SOME;
+                                               SWAP;
+                                               UPDATE;
+                                             }
+                                             { # user does not yet have an account, make one.
+                                               SOME;
+                                               SWAP;
+                                               UPDATE;
+                                             };
+                                     SWAP;
                                      SOME;
                                      SENDER;
                                      UPDATE;
