@@ -53,7 +53,7 @@ Have any questions or feedback? Join the conversation on the [Telegram channel](
 
 # Project Overview
 
-<img align="center" width="auto" src="https://i.ibb.co/TvjLvmB/Staking-Economy-1.png">
+<img align="center" width="auto" src="https://i.ibb.co/SV17fLz/Staking-Economy-n.png">
 
 
 DAO Baker architecture **_discards the concept of a single entity as a validator entirely for an on-chain smart contract._** Therefore, staking validators no longer specify the reward rate nor control the reward distribution when accepting delegation. Instead, users merely delegate the funds to a staking **SLOT** address and DAO Baker automates the rest including in-protocol reward distribution. Users receive a fungible token for the supplied asset as a tokenised stake representation so that the user can withdraw the asset at any time by burning the token.
