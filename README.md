@@ -84,7 +84,7 @@ SLOTS keep a permanent record of every batch that ever took place so you can det
  
 
 <p>
-<img align="right" width="350" src="https://i.ibb.co/ZJk01pr/Slot-Architecture.png"> 
+  <img align="right" width="350" src="https://i.ibb.co/dM4qNHG/Slot-Architecture.png"> 
 We implement the arbitrary concept of baking SLOTS for modular stake management that is in line with the core protocol. SLOTS represent a set of XTZ delegated to a SLOT ID (key) that is ensured by a bond lender aka SLOT Owner. SLOTS hold 8,000 XTZ, the same as a ROLL in the core consensus staking process; SLOTS are an abstraction of a ROLL in the Tezos core protocol.
 </p>
 
@@ -115,7 +115,7 @@ Risk bearing delegations (aka SLOT tokens) for bond lenders are tokens with an a
 | `withdrawal` | Allows the user to **withdraw XTZ** at any time by using the contract withdrawal function (multiples of 1 XTZ). In case of performing a _complete withdrawal_, the account will get closed.|
 | `close_account` | Handles the **final settlement** of the account and also gets triggered in the event of a complete withdrawal of XTZ from the account.|
 | `distribute` | Handles the **payout of staking rewards** to designated accounts and also handles final settlement on account closing events. |
-| `slot` | Handles the **creation of a new slot**. Once a person transfer sufficient amount of tez with this entrypoint as argument and a baker address, the slot contract will be created which delegates their tez to the specified baker. |
+| `slot` | Handles the **creation of a new slot**. Once a person transfer sufficient amount of XTZ with this entrypoint as argument and a baker address, the slot contract will be created which delegates their XTZ to the specified baker. |
 
 
 ## Licensing
