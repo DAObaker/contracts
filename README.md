@@ -44,7 +44,6 @@ DAO Baker is a 100% open source project.
 - Community Index (TBA)
 
 ### Relay Node - Bakery
-- BDE (TBA)
 - Validator Infrastructure (TBA)
 
 ## More Information
