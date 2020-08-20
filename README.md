@@ -19,9 +19,9 @@ This standard Decentralised Autonomous Organisation (DAO) Baker is written in Mi
 
 ## Motivation 
 
-DAO Baker is an earnest effort by **[Block Swap](https://blockswap.xyz)** to decentralise the **Tezos (XTZ) staking (aka baking)** process through a set of self-enforcing smart contracts. This provides block by block transparency and auditability, thus minimising reliance on centralised discretionary staking providers.
+DAO Baker is an earnest effort to decentralize the **Tezos (XTZ) staking (aka baking)** process through a set of self-enforcing smart contracts. This provides block by block transparency and auditability, thus minimizing reliance on offchain discretionary staking practices and make it on-chain smartcontract driven.
 
-The purpose is to address the user experience and inefficiency plaguing the current staking process that limits the benefit  to niche technical crypto users. Our solution intends to provide a mainstream user experience for Tezos staking.
+The purpose is to address the user experience and inefficiency plaguing the current staking process and rewards distribution that limits the benefit to niche users. Our solution intends to provide a mainstream user experience for Tezos staking.
 DAO Baker is a 100% open source project.
 
 ## Table of Contents
@@ -38,28 +38,28 @@ DAO Baker is a 100% open source project.
 - Bonds (security deposit)
 - Rewards & Payouts
 
-### Protocol Politician  - Governance 
+### Governance hatch 
 - Registration & Profile 
 - Baker Rights & Management (TBA) 
 - Community Index (TBA)
 
-### Relay Node - Bakery
-- Validator Infrastructure (TBA)
+### Relay Node 
+- Validator beacon (TBA)
 
 ## More Information
 
-Have any questions or feedback? Join the conversation on the [Telegram channel](https://t.me/daobaker/). Also, see the "DAO Baker" [article series](https://medium.com/@blockswap_hq/) for our primary thesis and some of the motivations, features, and design decisions of the DAO Baker.
+Have any questions or feedback? Join the conversation on the [Telegram channel](https://t.me/daobaker/). Also, see the "DAO Baker" [article series](https://medium.com/crypto-capital-markets/) for our primary thesis and some of the motivations, features, and design decisions of the DAO Baker.
 
 # Project Overview
 
 <img align="center" width="auto" src="https://i.ibb.co/SV17fLz/Staking-Economy-n.png">
 
 
-DAO Baker architecture **_discards the concept of a single entity as a validator entirely for an on-chain smart contract._** Therefore, staking validators no longer specify the reward rate nor control the reward distribution when accepting delegation. Instead, users merely delegate the funds to a staking **SLOT** address and DAO Baker automates the rest including in-protocol reward distribution. Users receive a fungible token for the supplied asset as a tokenised stake representation so that the user can withdraw the asset at any time by burning the token.
+DAO Baker architecture **_discards the concept of an offchain entity as a validator entirely for an on-chain smart contract._** Therefore, staking validators no longer need to specify the reward rate nor control the reward distribution when accepting delegation. Instead, users merely delegate the funds to a staking **SLOT** address and DAO Baker SDK automates the rest including in-protocol reward distribution, this ease the process for both staking validator and users having an onchain metaledger for their staking returns at roll level. Users receive a fungible token for the supplied asset as a tokenized stake representation so that the user can withdraw the asset at any time by burning the token.
 
 The whole process takes place on-chain. Hence, this is a very simple but very different from the traditional staking validator that we are used to.
 
-#### [A detailed writeup on staking process is available here](https://medium.com/@blockswap_hq/staking-economy-in-visible-dance-8ab7c6eb5fbd)
+#### [A detailed writeup on staking process is available here](https://medium.com/crypto-capital-markets/staking-economy-in-visible-dance-8ab7c6eb5fbd)
 
 **Key Components of Stake Management:** 👇
 
@@ -75,7 +75,7 @@ There is also an account recovery **Escape Hatch** option built-in. This can be 
 
 ## SLOT - Stake Management   
 
-SLOTS act as a way of assembling batches for asset flow within the stake market. Records of the state of SLOTS distribution map updates every 256 blocks.
+SLOTS act as a way of assembling batches for asset flow within the staking economy. Records of the state of SLOTS distribution map updates every 256 blocks.
 
 SLOTS keep a permanent record of every batch that ever took place so you can determine who sent what to who, and how their account balances have changed. The result of this process is recorded as an on-chain commit hash of what happened on the stake distribution network.
 
