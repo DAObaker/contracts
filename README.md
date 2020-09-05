@@ -106,7 +106,7 @@ Risk bearing delegations (aka SLOT tokens) for bond lenders are tokens with an a
 
 
 ## Contract details 👇
-#### [See deployed contract here](https://carthagenet.tzstats.com/KT1J7VKG2JubhZKczCdktQGRhcieTRHbvJfa)
+#### [See deployed POC contract here](https://carthagenet.tzstats.com/KT1J7VKG2JubhZKczCdktQGRhcieTRHbvJfa)
 
 | Key Functions|  Description |
 | --- | --- |
