@@ -1,27 +1,30 @@
+<!---
 ![DAObaker banner](images/Github%20banner.png)
+--->
+<img align="center" width="auto" src="https://i.ibb.co/kx9RLQg/Github-banner.png">
 
 
 # DAO Baker
 
-**_Self-amending DAO for Staking Economy_**
-> An upgradeable, on-chain staking validator for the Tezos community earning staking rewards. Additional features include peer-to-peer participation and automation of the entire baking process and governance voting.
+**_Self-amending Smart Contract Stack for Staking Economy_**
+> An upgradeable, on-chain tokenized staking validator for the Tezos community earning staking rewards. Additional features include peer-to-contract participation and automation of the entire baking process and reward distribution.
 
 Note: this is an evolving experiment and a proof of concept.
-This standard Decentralised Autonomous Organisation (DAO) Baker is written in Michelson and runs on the Tezos blockchain.
+This standard DAO Baker - Staking Contract is written in Michelson and runs on the Tezos blockchain.
 
 [![Vault Contract](https://img.shields.io/badge/vault%20contract-2.0-blue
 )](https://carthagenet.tzstats.com/KT1J7VKG2JubhZKczCdktQGRhcieTRHbvJfa)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Telegram](https://badgen.net/badge/icon/telegram?icon=telegram&label=community
 )](https://t.me/daobaker)
-[![Twitter Follow](https://badgen.net/twitter/follow/blockswap_hq?icon=twitter)](https://twitter.com/intent/follow?screen_name=blockswap_hq)
+[![Twitter Follow](https://badgen.net/twitter/follow/swapmarket_hq?icon=twitter)](https://twitter.com/intent/follow?screen_name=swapmarket_hq)
 
 
 ## Motivation 
 
-DAO Baker is an earnest effort to decentralize the **Tezos (XTZ) staking (aka baking)** process through a set of self-enforcing smart contracts. This provides block by block transparency and auditability, thus minimizing reliance on offchain discretionary staking practices and make it on-chain smartcontract driven.
+DAO Baker is an earnest effort to decentralize the **Tezos (XTZ) staking (aka baking)** process through a set of self-enforcing smart contracts. This provides block by block transparency and auditability, thus minimizing reliance on offchain discretionary staking practices and make it automated through on-chain smartcontracts and be fully auditable.
 
-The purpose is to address the user experience and inefficiency plaguing the current staking process and rewards distribution that limits the benefit to niche users. Our solution intends to provide a mainstream user experience for Tezos staking.
+The purpose is to address the user experience and inefficiency plaguing the current staking process and rewards distribution that limits the benefit to niche users. Our solution intends to provide a mainstream user experience for Tezos contract based staking.
 DAO Baker is a 100% open source project.
 
 ## Table of Contents
@@ -70,7 +73,7 @@ The current implementation of the **Vault** works as follows:
 
 Allows users to make **_deposits and stake XTZ by simply sending XTZ to the contract_**, and the contract will automate the account generation and rewards allocation to that address. Account addresses are counterfactual based on the initial user deposit key and can be safely deployed by anyone using the vault contract. A user can make withdrawals partially or completely. When withdrawn completely, the user automatically redeems and transfers the account balance XTZ to the originated address. A user may cancel the delegation at any time should they wish and withdraw their balance with accumulated rewards.
 
-There is also an account recovery **Escape Hatch** option built-in. This can be used in the event that a user has lost access to their account or the contract has been compromised. Additional features will be rolled out incrementally for the vault module, such as the ability to receive custom periodical payouts and portfolio management features.
+There is also an account recovery **Escape Hatch** option built-in. This can be used in the event that a user has lost access to their account or the contract has been compromised. Additional features will be rolled out incrementally for the vault module, such as the ability to configure custom managed delegations and portfolio management features.
 
 
 ## SLOT - Stake Management   
